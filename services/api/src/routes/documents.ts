@@ -33,6 +33,17 @@ router.post('/', async (req, res, next) => {
       .update(`${req.demoUser.organisationId}:${input.fileName}:${input.content}`)
       .digest('hex');
 
+
+    const existing = await DocumentRecord.findOne({
+      organisationId: req.demoUser.organisationId,
+      uploadFingerprint
+    });
+
+    if (existing) {
+      res.status(200).json({ item: existing.toObject() });
+      return;
+    }
+
     const record = await DocumentRecord.create({
       organisationId: req.demoUser.organisationId,
       uploadedBy: req.demoUser.id,
@@ -64,7 +75,7 @@ router.get('/:id', async (req, res, next) => {
       return;
     }
 
-    const item = await DocumentRecord.findById(req.params.id)
+    const item = await DocumentRecord.findOne({ _id: req.params.id, organisationId: req.demoUser.organisationId })
       .select('-sourceText')
       .lean();
 

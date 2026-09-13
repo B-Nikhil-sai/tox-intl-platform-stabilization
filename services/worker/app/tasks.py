@@ -36,7 +36,7 @@ def process_document(
         organisation_id,
         attempt,
     )
-    records.update_one({"_id": object_id}, {"$set": {"status": "processing"}})
+    records.update_one({"_id": object_id, "attempt": attempt}, {"$set": {"status": "processing"}})
 
     try:
         time.sleep(processing_delay(attempt))
@@ -44,7 +44,7 @@ def process_document(
         result["summary"] = f"{result['summary']} (attempt {attempt})"
 
         records.update_one(
-            {"_id": object_id},
+            {"_id": object_id, "attempt": attempt},
             {
                 "$set": {
                     "status": "completed",
@@ -62,7 +62,7 @@ def process_document(
         return {"documentId": document_id, "attempt": attempt, "status": "completed"}
     except Exception as exc:
         records.update_one(
-            {"_id": object_id},
+            {"_id": object_id, "attempt": attempt},
             {"$set": {"status": "failed", "errorMessage": "Processing failed"}},
         )
         logger.exception("document_processing_failed document_id=%s attempt=%s", document_id, attempt)
