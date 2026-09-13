@@ -63,7 +63,7 @@ const item = await DocumentRecord.findOne({
 
 ### Verification
 - Backend (curl): bob's request for Alice's ID now returns `404 Document not found`; alice can still retrieve her own document normally.
-- UI: [confirm alice/bob cross-access via browser, then check this line]
+- Frontend (UI): confirmed via browser — switching from alice to bob on the same document URL now shows a not-found error with no leaked content (fixed alongside a related stale-state bug in `DocumentDetail.tsx`, where the previous document remained rendered underneath the error banner).
 
 ---
 
@@ -95,7 +95,7 @@ if (existing) {
 
 ### Verification
 - Backend (curl): re-submitting identical content returns the original record (`200`, same `_id`); document count in MongoDB does not increase.
-- UI: [confirm repeated upload behavior via browser, then check this line]
+- Frontend (UI): confirmed — re-uploading identical content produces no new entry in the document list; Network tab confirmed the response returns the original document's `_id`, not a new one.
 
 ---
 
@@ -126,8 +126,7 @@ Applied to all three write paths (`processing`, `completed`, `failed`). This is 
 
 ### Verification
 - Backend: bug reproduced live pre-fix (confirmed inconsistent `attempt`/summary mismatch); fix applied to all three write paths.
-- Backend (post-fix live race re-test): [pending / confirm result]
-- UI: [confirm retry behavior via browser, then check this line]
+- Backend (post-fix live race re-test): confirmed — final document state showed consistent `attempt: 2` with matching `(attempt 2)` summary text, no stale overwrite.
 
 ---
 
