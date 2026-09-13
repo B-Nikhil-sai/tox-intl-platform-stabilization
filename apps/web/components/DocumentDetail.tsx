@@ -22,8 +22,10 @@ export function DocumentDetail({ documentId, initialUser }: Props) {
       setError('');
       const response = await api.getDocument(documentId, user);
       setItem(response.item);
+      setError('');
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : 'Unable to load document');
+      setItem(undefined);
+          setError(requestError instanceof Error ? requestError.message : 'Unable to load document');
     }
   }, [documentId, user]);
 
@@ -32,9 +34,11 @@ export function DocumentDetail({ documentId, initialUser }: Props) {
     api.getDocument(documentId, user)
       .then((response) => {
         if (!cancelled) setItem(response.item);
+      setError('');
       })
       .catch((requestError: unknown) => {
         if (!cancelled) {
+          setItem(undefined);
           setError(requestError instanceof Error ? requestError.message : 'Unable to load document');
         }
       });
@@ -48,6 +52,7 @@ export function DocumentDetail({ documentId, initialUser }: Props) {
       setIsRetrying(true);
       const response = await api.retryDocument(documentId, user);
       setItem(response.item);
+      setError('');
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : 'Unable to retry');
     } finally {
